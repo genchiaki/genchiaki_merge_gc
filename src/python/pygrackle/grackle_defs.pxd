@@ -7,7 +7,14 @@ cdef extern from "grackle_chemistry_data.h":
         int use_grackle
         int with_radiative_cooling
         int primordial_chemistry
+        int metal_chemistry
         int dust_chemistry
+        int grain_growth
+        int multi_metals
+        int metal_abundances
+        int dust_species
+        int dust_temperature_multi
+        int dust_sublimation
         int metal_cooling
         int UVbackground
         char *grackle_data_file
@@ -56,8 +63,18 @@ cdef extern from "grackle_chemistry_data.h":
         int radiative_transfer_coupled_rate_solver
         int radiative_transfer_intermediate_step
         int radiative_transfer_hydrogen_only
+        int radiative_transfer_H2II_diss
+        int radiative_transfer_HDI_diss
+        int radiative_transfer_metal_ion
+        int radiative_transfer_metal_diss
         int self_shielding_method
+        int radiative_transfer_use_H2_shielding
         int H2_self_shielding
+
+        int use_palla_salpeter_stahler_1983
+        int use_stancil_lepp_dalgarno_1998
+        int use_omukai_gas_grain
+        int use_uniform_grain_dist_gamma_isrf
 
     ctypedef struct c_chemistry_data_storage "chemistry_data_storage":
         double *k1
@@ -108,6 +125,68 @@ cdef extern from "grackle_chemistry_data.h":
         double *k58
 
         double *h2dust
+        double *h2dustS
+        double *h2dustC
+
+        double *grogr
+
+        double *k125
+        double *k129
+        double *k130
+        double *k131
+        double *k132
+        double *k133
+        double *k134
+        double *k135
+        double *k136
+        double *k137
+        double *k148
+        double *k149
+        double *k150
+        double *k151
+        double *k152
+        double *k153
+
+        double *kz15
+        double *kz16
+        double *kz17
+        double *kz18
+        double *kz19
+        double *kz20
+        double *kz21
+        double *kz22
+        double *kz23
+        double *kz24
+        double *kz25
+        double *kz26
+        double *kz27
+        double *kz28
+        double *kz29
+        double *kz30
+        double *kz31
+        double *kz32
+        double *kz33
+        double *kz34
+        double *kz35
+        double *kz36
+        double *kz37
+        double *kz38
+        double *kz39
+        double *kz40
+        double *kz41
+        double *kz42
+        double *kz43
+        double *kz44
+        double *kz45
+        double *kz46
+        double *kz47
+        double *kz48
+        double *kz49
+        double *kz50
+        double *kz51
+        double *kz52
+        double *kz53
+        double *kz54
 
         double *n_cr_n
         double *n_cr_d1
@@ -157,18 +236,175 @@ cdef extern from "grackle_chemistry_data.h":
         double *HDlow
 
         double *cieco
+        double *cieY06
 
         double gammah
 
         double *regr
 
         double gamma_isrf
+        double gamma_isrf2
 
         double *gas_grain
+        double *gas_grain2
                                 
         double hi_avg_crs
         double hei_avg_crs
         double heii_avg_crs
+
+        int     SN0_N
+        double *SN0_XC 
+        double *SN0_XO 
+        double *SN0_XMg
+        double *SN0_XAl
+        double *SN0_XSi
+        double *SN0_XS 
+        double *SN0_XFe
+        double *SN0_fC 
+        double *SN0_fO 
+        double *SN0_fMg
+        double *SN0_fAl
+        double *SN0_fSi
+        double *SN0_fS 
+        double *SN0_fFe
+        double *SN0_fSiM
+        double *SN0_fFeM
+        double *SN0_fMg2SiO4
+        double *SN0_fMgSiO3
+        double *SN0_fFe3O4
+        double *SN0_fAC
+        double *SN0_fSiO2D
+        double *SN0_fMgO
+        double *SN0_fFeS
+        double *SN0_fAl2O3
+        double *SN0_freforg 
+        double *SN0_fvolorg 
+        double *SN0_fH2Oice
+        double *SN0_r0SiM
+        double *SN0_r0FeM
+        double *SN0_r0Mg2SiO4
+        double *SN0_r0MgSiO3
+        double *SN0_r0Fe3O4
+        double *SN0_r0AC
+        double *SN0_r0SiO2D
+        double *SN0_r0MgO
+        double *SN0_r0FeS
+        double *SN0_r0Al2O3
+        double *SN0_r0reforg 
+        double *SN0_r0volorg 
+        double *SN0_r0H2Oice 
+
+        int    *LH2_N
+        int     LH2_Size
+        double *LH2_D
+        double *LH2_T
+        double *LH2_H
+        double  LH2_dD
+        double  LH2_dT
+        double  LH2_dH
+        double *LH2_L
+        int    *LHD_N
+        int     LHD_Size
+        double *LHD_D
+        double *LHD_T
+        double *LHD_H
+        double  LHD_dD
+        double  LHD_dT
+        double  LHD_dH
+        double *LHD_L
+
+        int    *LCI_N
+        int     LCI_Size
+        double *LCI_D
+        double *LCI_T
+        double *LCI_H
+        double  LCI_dD
+        double  LCI_dT
+        double  LCI_dH
+        double *LCI_L
+        int    *LCII_N
+        int     LCII_Size
+        double *LCII_D
+        double *LCII_T
+        double *LCII_H
+        double  LCII_dD
+        double  LCII_dT
+        double  LCII_dH
+        double *LCII_L
+        int    *LOI_N
+        int     LOI_Size
+        double *LOI_D
+        double *LOI_T
+        double *LOI_H
+        double  LOI_dD
+        double  LOI_dT
+        double  LOI_dH
+        double *LOI_L
+
+        int    *LCO_N
+        int     LCO_Size
+        double *LCO_D
+        double *LCO_T
+        double *LCO_H
+        double  LCO_dD
+        double  LCO_dT
+        double  LCO_dH
+        double *LCO_L
+        int    *LOH_N
+        int     LOH_Size
+        double *LOH_D
+        double *LOH_T
+        double *LOH_H
+        double  LOH_dD
+        double  LOH_dT
+        double  LOH_dH
+        double *LOH_L
+        int    *LH2O_N
+        int     LH2O_Size
+        double *LH2O_D
+        double *LH2O_T
+        double *LH2O_H
+        double  LH2O_dD
+        double  LH2O_dT
+        double  LH2O_dH
+        double *LH2O_L
+
+        int    *alphap_N
+        int     alphap_Size
+        double *alphap_D
+        double *alphap_T
+        double  alphap_dD
+        double  alphap_dT
+        double *alphap_Data
+
+        int    *grain_N
+        int     grain_Size
+        double *grain_D
+        double *grain_T
+        double  grain_dD
+        double  grain_dT
+        double *Hgrain
+        double *Tgrain
+        double *Ograin
+        double *Lgrain
+
+        int    *gr_N
+        int     gr_Size
+        double  gr_dT
+        double *gr_Td
+        double *SN0_kpSiM
+        double *SN0_kpFeM
+        double *SN0_kpMg2SiO4
+        double *SN0_kpMgSiO3
+        double *SN0_kpFe3O4
+        double *SN0_kpAC
+        double *SN0_kpSiO2D
+        double *SN0_kpMgO
+        double *SN0_kpFeS
+        double *SN0_kpAl2O3
+        double *SN0_kpreforg 
+        double *SN0_kpvolorg 
+        double *SN0_kpH2Oice
 
 cdef extern from "grackle_types.h":
     ctypedef struct c_code_units "code_units":

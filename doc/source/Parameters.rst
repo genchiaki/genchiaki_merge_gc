@@ -39,10 +39,27 @@ For all on/off integer flags, 0 is off and 1 is on.
       H\ :sup:`-`, H\ :sub:`2`, H\ :sub:`2`\ :sup:`+`.
     - 3: 12-species network include all above plus HD rotation cooling.
       Active species: above + D, D\ :sup:`+`, HD.
+    - 4: 15-species network include all above.
+      Active species: above + H\ :sup:`-`, HD\ :sup:`+`, HeH\ :sup:`+`.
 
 .. note:: In order to make use of the non-equilibrium chemistry
-   network (:c:data:`primordial_chemistry` options 1-3), you must add
+   network (:c:data:`primordial_chemistry` options 1-4), you must add
    and advect baryon fields for each of the species used by that
+   particular option.
+
+.. c:var:: int metal_chemistry
+
+    Flag to solve metal chemistry network. Default: 0.
+    Active species:
+       C , C\ :sup:`+`, CO, CO\ :sub:`2`
+       O , OH, H\ :sub:`2`\O, O\ :sub:`2`
+       Si, SiO, SiO\ :sub:`2`
+       CH, CH\ :sub:`2`, CO\ :sup:`+`, O\ :sup:`+`
+       OH\ :sup:`+`, H\ :sub:`2`\O\ :sup:`+`, H\ :sub:`3`\O\ :sup:`+`, O\ :sub:`2`\ :sup:`+` 
+
+.. note:: In order to make use of the non-equilibrium chemistry
+   network (:c:data:`metal_chemistry`), you must add
+   and advect baryon fields of metal/dust density and each of the species used by that
    particular option.
 
 .. c:var:: int dust_chemistry
@@ -68,6 +85,91 @@ For all on/off integer flags, 0 is off and 1 is on.
 .. note:: Other values for :c:data:`photoelectric_heating` may also be used
    in conjunction with setting the :c:data:`dust_chemistry` parameter. It will
    only be changed to 2 if unset.
+
+.. c:var:: int grain_growth
+
+   Flag to solve the growth of dust grains through the accretion of gas-phase
+   metal molecules follow `Chiaki (2015)
+   <https://ui.adsabs.harvard.edu/abs/2015MNRAS.446.2659C>`_. Default: 0.
+
+    - 0: no grain growth.
+    - 1: Solve grain growth reactions for 2 grain species and a relevant gas-phase species.
+         (grains) enstatite and carbonacious grains.
+         (gas-phase) Mg
+    - 2: grain growth reactions for above + 8 grain species and 3 gas-phase species.
+         (grains) above + metallic silicon, metallic iron,
+                  forsterite, magnetite, silica,
+                  magnesia, troilite, alumina
+         (gas-phase) above + Al, Si, Fe
+    - 2: grain growth reactions for above + 3 grain species.
+         (grains) above + refractory organics, volatile organics, water ice.
+
+.. note:: In order to make use of this flag
+   (:c:data:`grain_growth`) you must add
+   and advect baryon fields for each of the species used by that
+   particular option.
+
+.. c:var:: int multi_metals
+
+   Flag to enable multiple metalicity fields. Default: 0.
+
+    - 0: Give a single metallicity field.
+      The elemental abundance is set by the parameter :c:data:`metal_abundances`.
+    - 1: Give 12 metallicity fields that have metal/dust abundances of
+      * 0. Local ISM
+        (`Pollack et al. 1994 <https://ui.adsabs.harvard.edu/abs/1994ApJ...421..615P>`)
+      * 1-4. Pop III normal core-collapse supernovae
+        with progenitor masses of (1) 13, (2) 20, (3) 25 and (4) 30 Msun
+        (`Nozawa et al. 2007 <https://ui.adsabs.harvard.edu/abs/2007ApJ...666..955N>`)
+      * 5-8. Pop III faint supernovae (Marassi et al. 2014)
+        with progenitor masses of (5) 13, (6) 15, (7) 50 and (8) 80 Msun
+        (`Marassi et al. 2014 <https://ui.adsabs.harvard.edu/abs/2014ApJ...794..100M>`)
+      * 9-10. Pop III pair-instability supernovae
+        with progenitor masses of (9) 170 and (10) 200 Msun
+        (`Nozawa et al. 2007 <https://ui.adsabs.harvard.edu/abs/2007ApJ...666..955N>`)
+      * 11. Simple dust model. Include only silicate and graphite> Single size
+        (`Yajima et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017ApJ...846....3Y>`)
+
+.. note:: In order to make use of this flag (:c:data:`multi_metals`)
+   you must add and advect baryon fields for the mass fraction of metals and grains.
+   If :c:data:`multi_metals` = 1, you need additional 12 metallicity fields listed
+   above.
+   We recommend :c:data:`metal_chemistry` = 1.
+                :c:data:`dust_species` >= 1, if you use :c:data:`multi_metals` = 0.
+                :c:data:`dust_species` >= 2, if you use :c:data:`multi_metals` = 1-10.
+                :c:data:`dust_species` >= 3, if you use :c:data:`multi_metals` = 11.
+
+.. c:var:: int metal_abundances
+
+   Flag to control which metal abundnace is used if :c:data:`multi_metals` = 0.
+   You can select a metal/dust abundance pattern from the list of c:data:`multi_metals`.
+   Default: 0.
+
+.. c:var:: int dust_species
+
+   Flag to consider multiple grain species. Default: 0
+
+    - 0. a single dust component.
+         Mixture of grain species:
+            olivine, orthopyroxene, metallic iron
+            water ice, troilite, refractory organics, volatile organics
+         `Omukai (2000) <http://adsabs.harvard.edu/abs/2000ApJ...534..809O>`_.
+    - 1. enstatite + carbonaceous grains
+    - 2. above + metallic silicon + metallic iron + forsterite + magnetite + silica + magnesia + troilite + alumina
+    - 3. above + water ice + volatile organics + refractory organics
+
+.. c:var:: int dust_temperature_multi
+
+   Flag to calculate dust temperatures of each grain species if :c:data:`dust_species` > 0.
+   Default: 0.
+
+    - 0. calculate a single dust temperature and cooling rate.
+         Average of all grain species.
+    - 1. calculate dust temperature and cooling rate of each grain species.
+
+.. c:var:: int dust_sublimation
+
+   Flag to enable dust sublimation. Default: 0.
 
 .. c:var:: int h2_on_dust
 
@@ -352,6 +454,29 @@ For all on/off integer flags, 0 is off and 1 is on.
    Flag to only use hydrogen ionization and heating rates from the 
    radiative transfer solutions. Default: 0.
 
+.. c:var:: int radiative_transfer_H2II_diss
+
+   Flag to use H\ :sub:`2`\ :sup:`+` photodissociation. Default: 0.
+
+.. c:var:: int radiative_transfer_HDI_diss
+
+   Flag to use HD photodissociation. Default: 0.
+
+.. c:var:: int radiative_transfer_metal_ion
+
+   Flag to use C/O photoionization. Default: 0.
+
+.. c:var:: int radiative_transfer_metal_diss
+
+   Flag to use CO, OH, H\ :sub:`2`\O photodissociation. Default: 0.
+
+.. c:var:: int radiative_transfer_use_H2_shielding
+
+   If you include H2 self-shielding in your hydrodynamics code,
+   set the parameter :c:data:`radiative_transfer_use_H2_shielding` to 1
+   in order not to double-count self-shielding when c:data:`H2_self_shielding` = 1.
+   Default: 0.
+
 .. c:var:: int H2_self_shielding
 
    Switch to enable approximate H\ :sub:`2`\  self-shielding from both the UV
@@ -462,6 +587,26 @@ For all on/off integer flags, 0 is off and 1 is on.
 
    On/off flag to toggle calculation of rate coefficients corresponding to bremsstrahlung cooling 
    (``brem``). Default: 1
+
+.. c:var:: int use_palla_salpeter_stahler_1983
+
+   Flag to use the H\ :sub:`2` collitional dissociation rate of Palla, Salpeter & Stahler (1983).
+   Default: 0.
+
+.. c:var:: int use_stancil_lepp_dalgarno_1998
+
+   Flag to use the deuterium chemistry rates k50-k56 of Stancil, Lepp & Dalgarno (1998).
+   Default: 0.
+
+.. c:var:: int use_omukai_gas_grain
+
+   Flag to use the gas-grain heat transfer rate for an MRN size distribution.
+   Default: 0.
+
+.. c:var:: int use_uniform_grain_dist_gamma_isrf
+
+   Flag to calculate the ISRF heating rate for a uniform grain size distribution.
+   Default: 0.
 
 .. c:var:: int omp_nthreads
 

@@ -51,8 +51,6 @@ OBJS_CONFIG_LIB = \
         calc_rates_dust_P200.lo \
         calc_rates_dust_Y19.lo \
         lookup_cool_rates0d.lo \
-        calc_tdust_1d_g.lo \
-        calc_tdust_3d_g.lo \
         calc_grain_size_increment_1d.lo \
         rate_functions.lo \
         initialize_rates.lo \
